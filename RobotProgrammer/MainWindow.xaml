@@ -1,0 +1,57 @@
+﻿<Window x:Class="RobotProgrammer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RobotProgrammer"
+        mc:Ignorable="d"
+        Title="Robot Programmer" Height="600" Width="800" SizeToContent="Height" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ListView Name="InstructionListView" Padding="5" Margin="5">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Focusable" Value="false"/>
+                    <Setter Property="IsSelected" Value="{Binding IsActive}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <Grid Grid.Column="1" Margin="5" Name="MapGrid" VerticalAlignment="Center" />
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <TextBox Name="CodeTextBox" Padding="5" Margin="5" TextWrapping="Wrap" IsReadOnly="True" />
+        </ScrollViewer>
+        <Grid Grid.Row="1" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Margin="5" Padding="5" Click="OptionsButton_Click">Opcje</Button>
+            <Button Grid.Column="1" Margin="5" Padding="5" Name="StartButton" Click="StartButton_Click" >Start</Button>
+            <Button Grid.Column="2" Name="StopButton" Margin="5" Padding="5" Click="StopButton_Click">Stop</Button>
+            <Button Grid.Column="3" Margin="5" Padding="5" Click="EndButton_Click">Koniec</Button>
+            <Button Grid.Column="4" Margin="5" Padding="5" Click="GenerateButton_Click">Generuj</Button>
+            <Button Grid.Column="5" Margin="5" Padding="5" Click="ClearButton_Click">Czyść</Button>
+            <Grid Grid.Column="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <RadioButton Name="PathRadiobutton" Margin="5" Padding="5" IsChecked="True">Ścieżka</RadioButton>
+                <RadioButton Name="ObstacleRadiobutton" Grid.Row="1" Margin="5" Padding="5">Przeszkoda</RadioButton>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,35 @@
+#define AXLE %AXLE%
+#define WHEEL %WHEEL%
+#define AXLE_ANGLE 90
+#define WHEEL_ANGLE (AXLE_ANGLE * AXLE / (WHEEL / 2))
+#define TURN_POW 25
+#define BASE_POW 50.0
+
+#define STEP %STEP%
+#define PORT %PORT%
+
+sub goForward(int distance)
+{
+ OnFwd(PORT, BASE_POW);
+ Wait(STEP * distance);
+ Off(PORT);
+}
+
+sub turnRight()
+{
+ RotateMotorEx(PORT, TURN_POW, -WHEEL_ANGLE, 100, true, true);
+ Off(PORT);
+ Wait(300);
+}
+
+sub turnLeft()
+{
+ RotateMotorEx(PORT, TURN_POW, WHEEL_ANGLE, -100, true, true);
+ Off(PORT);
+ Wait(300);
+}
+
+task main()
+{
+%BODY%
+}
