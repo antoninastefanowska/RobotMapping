@@ -28,15 +28,20 @@ namespace RobotProgrammer
 
         public bool ObstacleDetected()
         {
-            int x = robot.CurrentPosition.X - 2;
-            int y = robot.CurrentPosition.Y - 5;
+            int originX = robot.CurrentPosition.X - 2;
+            int originY = robot.CurrentPosition.Y - 5;
             bool output;
 
             for (int i = 0; i < 5; i++)
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    output = map.ObstacleMatrix[j + y, i + x] && SensorMask[j, i];
+                    int y = j + originY, x = i + originX;
+                    y = y < 0 ? 0 : y;
+                    y = y > map.Height - 1 ? map.Height - 1 : y;
+                    x = x < 0 ? 0 : x;
+                    x = x > map.Width - 1 ? map.Width - 1 : x;
+                    output = map.ObstacleMatrix[y, x] && SensorMask[j, i];
                     if (output)
                         return true;
                 }
@@ -46,16 +51,27 @@ namespace RobotProgrammer
 
         public List<Position> GetSensorPositions()
         {
-            int x = robot.CurrentPosition.X - 2;
-            int y = robot.CurrentPosition.Y - 5;
+            int originX = robot.CurrentPosition.X - 2;
+            int originY = robot.CurrentPosition.Y - 5;
             List<Position> positions = new List<Position>();
 
             for (int i = 0; i < 5; i++)
             {
                 for (int j = 0; j < 5; j++)
-                    positions.Add(new Position(x + i, y + j));
+                {
+                    int y = originY + j, x = originX + i;
+                    if (SensorMask[j, i] && y >= 0 && y < map.Height && x >= 0 && x < map.Width)
+                        positions.Add(new Position(x, y));
+                }
             }
             return positions;
+        }
+
+        public Position GetMainPosition()
+        {
+            int x = robot.CurrentPosition.X;
+            int y = robot.CurrentPosition.Y - 4;
+            return new Position(x, y);
         }
     }
 }

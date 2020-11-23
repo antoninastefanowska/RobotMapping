@@ -18,6 +18,8 @@ namespace RobotProgrammer
         private int height = 40;
 
         public Position InitialPosition { get; set; }
+        public Compass InitialOrientation { get; set; }
+
         public Position CurrentPosition { get; set; }
         public Compass CurrentOrientation { get; set; }
         public int CurrentInstructionIndex { get; set; }
@@ -25,6 +27,7 @@ namespace RobotProgrammer
 
         public Sensor Sensor { get; set; }
         public Map Map { get; set; }
+        public RobotMap RobotMap { get; set; }
 
         public SolidColorBrush normalColor = new SolidColorBrush(Colors.BlueViolet);
         public SolidColorBrush sensorColor = new SolidColorBrush(Colors.GreenYellow);
@@ -37,26 +40,29 @@ namespace RobotProgrammer
         private List<Storyboard> animations;
 
         private Rectangle[,] mapControls;
+        private TextBlock[,] numberControls;
 
         private Storyboard sensorStoryboard;
 
-        public static void CreateInstance(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls)
+        public static void CreateInstance(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls, TextBlock[,] numberControls)
         {
-            Instance = new Robot(canvas, startButton, tileSize, map, mapControls);
+            Instance = new Robot(canvas, startButton, tileSize, map, mapControls, numberControls);
         }
 
-        private Robot(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls)
+        private Robot(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls, TextBlock[,] numberControls)
         {
             this.canvas = canvas;
             this.tileSize = tileSize;
             this.startButton = startButton;
+            this.mapControls = mapControls;
+            this.numberControls = numberControls;
             CreateControl();
             Started = false;
             Running = false;
             animations = new List<Storyboard>();
             Sensor = new Sensor(this, map);
             Map = map;
-            this.mapControls = mapControls;
+            RobotMap = new RobotMap(map.Width, map.Height);
         }
 
         private void CreateControl()
@@ -103,6 +109,7 @@ namespace RobotProgrammer
 
         public void SetInitialDirection()
         {
+            InitialOrientation = new Compass(CurrentOrientation.Orientation);
             switch (CurrentOrientation.Orientation)
             {
                 case Compass.OrientationType.North:
@@ -162,6 +169,7 @@ namespace RobotProgrammer
                 {
                     case Instruction.Type.Forward:
                         animations.Add(GetMoveAnimation(instruction.Repeat));
+                        UpdatePosition();
                         break;
                     case Instruction.Type.TurnLeft:
                         animations.Add(GetTurnAnimation(-90));
@@ -175,14 +183,22 @@ namespace RobotProgrammer
                         animations.Add(GetSensorAnimation());
                         break;
                 }
-                UpdatePosition();
             }
             CurrentPosition = new Position(InitialPosition.X, InitialPosition.Y);
+            CurrentOrientation = new Compass(InitialOrientation.Orientation);
         }
 
         private void ReadSensor()
         {
+            bool detected = Sensor.ObstacleDetected();
             Console.WriteLine("{0}", Sensor.ObstacleDetected());
+            if (detected)
+            {
+                RobotMap.Update(CurrentPosition, Sensor.GetMainPosition());
+                List<Position> sensorPositions = Sensor.GetSensorPositions();
+                foreach (Position position in sensorPositions)
+                    numberControls[position.Y, position.X].Text = RobotMap.Map[position.Y, position.X].ToString();
+            }
         }
 
         private Storyboard GetSensorAnimation()
@@ -206,7 +222,6 @@ namespace RobotProgrammer
             List<Position> sensorPositions = Sensor.GetSensorPositions();
             foreach (Position position in sensorPositions)
             {
-                Console.WriteLine("{0}, {1}", position.X, position.Y);
                 Rectangle mapControl = mapControls[position.Y, position.X];
                 SolidColorBrush oldColor = mapControl.Fill as SolidColorBrush;
 
@@ -278,6 +293,10 @@ namespace RobotProgrammer
             turn.Duration = new Duration(TimeSpan.FromSeconds(0.5));
 
             storyboard.Completed += InstructionAnimation_Completed;
+            if (angle < 0)
+                storyboard.Completed += TurnLeftAnimation_Completed;
+            else
+                storyboard.Completed += TurnRightAnimation_Completed;
 
             SineEase sineEase = new SineEase();
             sineEase.EasingMode = EasingMode.EaseInOut;
@@ -316,6 +335,16 @@ namespace RobotProgrammer
         private void MoveAnimation_Completed(object sender, EventArgs e)
         {
             UpdatePosition();
+        }
+
+        private void TurnLeftAnimation_Completed(object sender, EventArgs e)
+        {
+            CurrentOrientation.TurnLeft();
+        }
+
+        private void TurnRightAnimation_Completed(object sender, EventArgs e)
+        {
+            CurrentOrientation.TurnRight();
         }
 
         private void UpdatePosition()

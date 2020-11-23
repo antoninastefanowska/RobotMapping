@@ -31,6 +31,7 @@ namespace RobotProgrammer
         private Program program;
 
         private Rectangle[,] mapControls;
+        private TextBlock[,] numberControls;
 
         public MainWindow()
         {
@@ -58,11 +59,26 @@ namespace RobotProgrammer
             return rectangle;
         }
 
+        private TextBlock CreateNumberControl()
+        {
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = "0";
+            textBlock.Foreground = new SolidColorBrush(Colors.MediumBlue);
+            textBlock.HorizontalAlignment = HorizontalAlignment.Stretch;
+            textBlock.VerticalAlignment = VerticalAlignment.Stretch;
+            textBlock.TextAlignment = TextAlignment.Center;
+            textBlock.IsHitTestVisible = false;
+            textBlock.Opacity = 0.1;
+            textBlock.FontSize = 20;
+            return textBlock;
+        }
+
         private void PopulateMapControl()
         {
             ColumnDefinition columnDefinition;
             RowDefinition rowDefinition;
             mapControls = new Rectangle[height, width];
+            numberControls = new TextBlock[height, width];
 
             for (int i = 0; i < width; i++)
             {
@@ -83,10 +99,15 @@ namespace RobotProgrammer
                 for (int j = 0; j < height; j++)
                 {
                     Rectangle rectangle = CreatePositionControl();
+                    TextBlock textBlock = CreateNumberControl();
                     mapControls[j, i] = rectangle;
+                    numberControls[j, i] = textBlock;
                     MapGrid.Children.Add(rectangle);
+                    MapGrid.Children.Add(textBlock);
                     Grid.SetRow(rectangle, j);
                     Grid.SetColumn(rectangle, i);
+                    Grid.SetRow(textBlock, j);
+                    Grid.SetColumn(textBlock, i);
                 }
             }
 
@@ -95,27 +116,8 @@ namespace RobotProgrammer
             Grid.SetColumnSpan(mapCanvas, width);
             Grid.SetRowSpan(mapCanvas, height);
 
-            Robot.CreateInstance(mapCanvas, StartButton, tileSize, map, mapControls);
+            Robot.CreateInstance(mapCanvas, StartButton, tileSize, map, mapControls, numberControls);
             robot = Robot.Instance;
-        }
-
-        private void Test()
-        {
-            RobotMap robotMap = new RobotMap(height, width);
-            Position robotPosition = new Position(7, 7);
-            int sensorRadius = 3;
-            //List<Position> positions = robotMap.Update(robotPosition, sensorRadius);
-
-            foreach (UIElement element in MapGrid.Children)
-            {
-                if (element is Rectangle)
-                {
-                    Rectangle rectangle = element as Rectangle;
-                    //foreach (Position position in positions)
-                        //if (Grid.GetColumn(element) == position.X && Grid.GetRow(element) == position.Y)
-                            //rectangle.Fill = checkedColor;
-                }
-            }
         }
 
         private void GenerateButton_Click(object sender, RoutedEventArgs e)

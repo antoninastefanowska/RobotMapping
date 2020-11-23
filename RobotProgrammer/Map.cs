@@ -132,16 +132,19 @@ namespace RobotProgrammer
                     case Position.NeighbourType.Right:
                         program.AddInstruction(Instruction.Type.TurnRight);
                         compass.TurnRight();
+                        program.AddInstruction(Instruction.Type.ReadSensor);
                         program.AddInstruction(Instruction.Type.Forward);
                         break;
                     case Position.NeighbourType.Left:
                         program.AddInstruction(Instruction.Type.TurnLeft);
                         compass.TurnLeft();
+                        program.AddInstruction(Instruction.Type.ReadSensor);
                         program.AddInstruction(Instruction.Type.Forward);
                         break;
                 }
                 current = next;
             }
+            program.AddInstruction(Instruction.Type.ReadSensor);
             return program;
         }
     }

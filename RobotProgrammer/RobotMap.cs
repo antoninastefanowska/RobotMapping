@@ -21,14 +21,21 @@ namespace RobotProgrammer
             Map = new int[Height, Width];
         }
 
-        public void Update(Position robotPosition, int sensorRadius, int sensorWidth)
+        public void Update(Position robotPosition, Position sensorPosition)
         {
-            int startX = robotPosition.X - sensorWidth / 2;
-            int endX = robotPosition.X + sensorWidth / 2;
-            int y = robotPosition.Y + sensorRadius;
-            for (int i = startX; i < endX; i++)
-            {
+            for (int i = robotPosition.Y - 1; i > sensorPosition.Y; i--)
+                if (Map[i, sensorPosition.X] > 0)
+                    Map[i, sensorPosition.X]--;
+            Map[sensorPosition.Y, sensorPosition.X] += 3;
+        }
 
+        public void Print()
+        {
+            for (int i = 0; i < Height; i++)
+            {
+                for (int j = 0; j < Width; j++)
+                    Console.Write("{0} ", Map[i, j]);
+                Console.WriteLine();
             }
         }
     }
