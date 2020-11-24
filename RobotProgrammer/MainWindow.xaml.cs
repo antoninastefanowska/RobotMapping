@@ -116,7 +116,7 @@ namespace RobotProgrammer
             Grid.SetColumnSpan(mapCanvas, width);
             Grid.SetRowSpan(mapCanvas, height);
 
-            Robot.CreateInstance(mapCanvas, StartButton, tileSize, map, mapControls, numberControls);
+            Robot.CreateInstance(mapCanvas, StartButton, tileSize, map, mapControls, numberControls, CodeTextBox);
             robot = Robot.Instance;
         }
 
@@ -128,7 +128,6 @@ namespace RobotProgrammer
             program.Wheel = wheel;
             program.Axle = axle;
             InstructionListView.ItemsSource = program.Instructions;
-            CodeTextBox.Text = program.GenerateCode();
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)

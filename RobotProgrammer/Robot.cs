@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -41,21 +42,23 @@ namespace RobotProgrammer
 
         private Rectangle[,] mapControls;
         private TextBlock[,] numberControls;
+        private TextBox textBox;
 
         private Storyboard sensorStoryboard;
 
-        public static void CreateInstance(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls, TextBlock[,] numberControls)
+        public static void CreateInstance(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls, TextBlock[,] numberControls, TextBox textBox)
         {
-            Instance = new Robot(canvas, startButton, tileSize, map, mapControls, numberControls);
+            Instance = new Robot(canvas, startButton, tileSize, map, mapControls, numberControls, textBox);
         }
 
-        private Robot(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls, TextBlock[,] numberControls)
+        private Robot(Canvas canvas, Button startButton, int tileSize, Map map, Rectangle[,] mapControls, TextBlock[,] numberControls, TextBox textBox)
         {
             this.canvas = canvas;
             this.tileSize = tileSize;
             this.startButton = startButton;
             this.mapControls = mapControls;
             this.numberControls = numberControls;
+            this.textBox = textBox;
             CreateControl();
             Started = false;
             Running = false;
@@ -81,7 +84,6 @@ namespace RobotProgrammer
             SetInitialPosition();
             SetInitialDirection();
             CreateAnimations();
-
             control.Visibility = Visibility.Visible;
             animations[0].Begin();
             CurrentProgram.Instructions[0].IsActive = true;
@@ -191,7 +193,7 @@ namespace RobotProgrammer
         private void ReadSensor()
         {
             bool detected = Sensor.ObstacleDetected();
-            Console.WriteLine("{0}", Sensor.ObstacleDetected());
+            textBox.Text += Sensor.ObstacleDetected().ToString() + "\n";
             if (detected)
             {
                 RobotMap.Update(CurrentPosition, Sensor.GetMainPosition());
@@ -326,6 +328,7 @@ namespace RobotProgrammer
                 Started = false;
             }
         }
+
 
         private void SensorAnimation_Completed(object sender, EventArgs e)
         {
